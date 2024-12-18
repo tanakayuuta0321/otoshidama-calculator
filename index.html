@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お年玉計算機</title>
+  </head>
+  <body>
+    <h1>お年玉計算機</h1>
+    <label>年齢（カンマ区切りで入力）: <input id="ages" /></label>
+    <button onclick="calculate()">計算</button>
+    <p id="result"></p>
+
+    <script>
+      function calculate() {
+        const ages = document.getElementById("ages").value.split(",").map(Number);
+        const amounts = ages.map(age => {
+          if (age >= 0 && age <= 3) return 1000;
+          if (age >= 4 && age <= 6) return 2000;
+          if (age >= 7 && age <= 12) return 3000;
+          if (age >= 13 && age <= 15) return 5000;
+          if (age >= 16 && age <= 18) return 7000;
+          return 0;
+        });
+        const total = amounts.reduce((sum, val) => sum + val, 0);
+        document.getElementById("result").innerText = `合計金額: ${total}円`;
+      }
+    </script>
+  </body>
+</html>
