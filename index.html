@@ -4,26 +4,199 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>お年玉計算機</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+      }
+
+      #age-groups {
+        margin-bottom: 20px;
+      }
+
+      .age-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .age-group button {
+        margin-left: 10px;
+        background-color: gray;
+        color: white;
+        border: none;
+        padding: 2px 5px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      #button-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      #calculate, #clear {
+        font-size: 14px;
+        padding: 10px 20px;
+        cursor: pointer;
+        border: none;
+        font-weight: bold;
+      }
+
+      #calculate {
+        background-color: blue;
+        color: white;
+      }
+
+      #clear {
+        background-color: gray;
+        color: white;
+      }
+
+      #add-person {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+      }
+
+      #add-person button {
+        font-size: 12px;
+        padding: 5px 10px;
+        cursor: pointer;
+        background-color: lightgray;
+        border: none;
+        color: black;
+      }
+
+      #result {
+        margin-top: 20px;
+      }
+
+      #otoshidama-image {
+        width: 100px;
+        height: auto;
+        margin-bottom: 10px;
+      }
+    </style>
   </head>
   <body>
+    <img id="otoshidama-image" src="./syougatsu2_otoshidama.png" alt="お年玉画像" />
     <h1>お年玉計算機</h1>
-    <label>年齢（カンマ区切りで入力）: <input id="ages" /></label>
-    <button onclick="calculate()">計算</button>
+
+    <div id="age-groups">
+      <div class="age-group">
+        <label>
+          1人目:
+          <select class="age-select">
+            <option value="1000">未就学児 (0~3歳)</option>
+            <option value="2000">幼稚園 (4~5歳)</option>
+            <option value="3000">小学校低学年 (6~9歳)</option>
+            <option value="4000">小学校高学年 (9~12歳)</option>
+            <option value="5000">中学校 (13~15歳)</option>
+            <option value="7000">高校 (16~18歳)</option>
+          </select>
+        </label>
+        <button class="remove-person">×</button>
+      </div>
+    </div>
+
+    <div id="add-person">
+      <button id="add-button">+人数追加</button>
+    </div>
+
+    <div id="button-container">
+      <button id="calculate">計算</button>
+      <button id="clear">クリア</button>
+    </div>
+
     <p id="result"></p>
+    <ul id="breakdown"></ul>
 
     <script>
-      function calculate() {
-        const ages = document.getElementById("ages").value.split(",").map(Number);
-        const amounts = ages.map(age => {
-          if (age >= 0 && age <= 3) return 1000;
-          if (age >= 4 && age <= 6) return 2000;
-          if (age >= 7 && age <= 12) return 3000;
-          if (age >= 13 && age <= 15) return 5000;
-          if (age >= 16 && age <= 18) return 7000;
-          return 0;
+      const ageGroups = document.getElementById("age-groups");
+
+      document.getElementById("add-button").addEventListener("click", () => {
+        const newGroup = document.createElement("div");
+        const personNumber = ageGroups.children.length + 1;
+        newGroup.className = "age-group";
+        newGroup.innerHTML = `
+          <label>
+            ${personNumber}人目:
+            <select class="age-select">
+              <option value="1000">未就学児 (0~3歳)</option>
+              <option value="2000">幼稚園 (4~5歳)</option>
+              <option value="3000">小学校低学年 (6~9歳)</option>
+              <option value="4000">小学校高学年 (9~12歳)</option>
+              <option value="5000">中学校 (13~15歳)</option>
+              <option value="7000">高校 (16~18歳)</option>
+            </select>
+          </label>
+          <button class="remove-person">×</button>
+        `;
+        ageGroups.appendChild(newGroup);
+        updatePersonLabels();
+      });
+
+      ageGroups.addEventListener("click", (e) => {
+        if (e.target.classList.contains("remove-person")) {
+          e.target.parentElement.remove();
+          updatePersonLabels();
+        }
+      });
+
+      document.getElementById("calculate").addEventListener("click", () => {
+        const selects = document.querySelectorAll(".age-select");
+        let total = 0;
+        const breakdown = document.getElementById("breakdown");
+        breakdown.innerHTML = "";
+        selects.forEach((select, index) => {
+          const amount = Number(select.value);
+          total += amount;
+          const listItem = document.createElement("li");
+          listItem.textContent = `${index + 1}人目: ${amount}円`;
+          breakdown.appendChild(listItem);
         });
-        const total = amounts.reduce((sum, val) => sum + val, 0);
         document.getElementById("result").innerText = `合計金額: ${total}円`;
+      });
+
+      document.getElementById("clear").addEventListener("click", () => {
+        ageGroups.innerHTML = `
+          <div class="age-group">
+            <label>
+              1人目:
+              <select class="age-select">
+                <option value="1000">未就学児 (0~3歳)</option>
+                <option value="2000">幼稚園 (4~5歳)</option>
+                <option value="3000">小学校低学年 (6~9歳)</option>
+                <option value="4000">小学校高学年 (9~12歳)</option>
+                <option value="5000">中学校 (13~15歳)</option>
+                <option value="7000">高校 (16~18歳)</option>
+              </select>
+            </label>
+            <button class="remove-person">×</button>
+          </div>
+        `;
+        document.getElementById("result").innerText = "";
+        document.getElementById("breakdown").innerHTML = "";
+      });
+
+      function updatePersonLabels() {
+        const labels = document.querySelectorAll(".age-group label");
+        labels.forEach((label, index) => {
+          label.querySelector("select").value = label.querySelector("select").value;
+          label.firstChild.textContent = `${index + 1}人目: `;
+        });
       }
     </script>
   </body>
